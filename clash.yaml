@@ -1,0 +1,178 @@
+port: 7890                   # HTTP 代理端口
+socks-port: 7891             # SOCKS5 代理端口
+#redir-port: 7892            # Linux 和 macOS 的 redir 代理端口
+mixed-port: 7893             # 混合端口 HTTP和SOCKS5用一个端口
+allow-lan: true              # 允许局域网的连接（可用来共享代理）
+bind-address: "*"            # 仅在将allow-lan设置为true时适用
+                             # #"*": 绑定所有IP地址
+ipv6: false                  # 开启 IPv6 总开关,关闭阻断所有 IPv6 链接和屏蔽 DNS 请求 AAAA 记录
+mode: rule                   # 规则模式：rule（规则） / global（全局代理）/ direct（全局直连）/ script (脚本)
+log-level: info              # 设置日志输出级别 (5 个级别：silent / error / warning / info / debug）
+external-controller: 127.0.0.1:9090      #外部控制器,可以使用 RESTful API 来控制你的 clash 内核
+
+dns: # DNS 
+  enable: true
+  prefer-h3: true
+  listen: 0.0.0.0:1053
+  ipv6: true
+  default-nameserver:
+    - 223.5.5.5
+    - 119.29.29.29
+  enhanced-mode: fake-ip
+  fake-ip-range: 198.18.0.1/16 # fake-ip 池设置
+  fake-ip-filter:
+    - "*"
+    - "+.lan"
+    - "+.local"
+  nameserver:
+    - https://1.1.1.1/dns-query
+    - https://8.8.8.8/dns-query
+  nameserver-policy:
+    "*.swust.edu.cn": # 西科大DNS解析
+      - 202.115.160.33
+      - 202.115.160.36
+    "geosite:cn,private":
+      - https://doh.pub/dns-query
+      - https://dns.alidns.com/dns-query
+
+# classical规则相关
+c: &c {type: http, behavior: classical, interval: 86400}
+# domain规则相关
+d: &d {type: http, behavior: domain, interval: 86400}
+# ipcidr规则相关
+i: &i {type: http, behavior: ipcidr, interval: 86400}
+
+proxy-providers:
+  provider1:
+    url: "https://feiniaoyun14.life/api/v1/client/subscribe?token=0fa9897e069bc1beaec2c43a2b318bf7"
+    type: http
+    interval: 86400 # 更新时间为一天
+    # 每10分钟健康检查节点信息,测试访问谷歌服务器的延迟,正常返回HTTP 204,超时时间3000毫秒
+    health-check: {enable: true,url: "https://www.gstatic.com/generate_204",interval: 600, timeout: 3000} 
+    filter: "日本|美国|英国"
+    exclude-filter: "推荐"
+    # override:
+      # additional-prefix: "[飞鸟云]" # 为节点名称添加固定前缀
+      # additional-suffix: "[飞鸟云]" # 为节点名称添加固定后缀
+  provider2:
+    url: "https://dash.djjc.cfd/api/v1/client/subscribe?token=120de374cebb69f74e2e441b6b1ea604"
+    type: http
+    interval: 86400
+    health-check: {enable: true,url: "https://www.gstatic.com/generate_204",interval: 600, timeout: 3000}
+    filter: "日本|美国|英国"
+    #exclude-filter: "推荐"
+    # override:
+      # additional-prefix: "[顶级机场]" # 为节点名称添加固定前缀
+      # additional-suffix: "[顶级机场]" # 为节点名称添加固定后缀
+proxies:
+  # 自建节点
+  - {"name":"🇭🇰 gcp-香港","type":"trojan","server":"hk.yssqtao.me","port":34666,"udp":true,"password":"D0bzl24zup","sni":"hk.yssqtao.me","skip-cert-verify":true,"network":"tcp", icon: https://fastly.jsdelivr.net/gh/clash-verge-rev/clash-verge-rev.github.io@main/docs/assets/icons/flags/hk.svg}
+  - {"name":"🇹🇼 gcp-台湾","type":"trojan","server":"tw.yssqtao.me","port":31725,"udp":true,"password":"ZkmLjq29SA","sni":"tw.yssqtao.me","skip-cert-verify":true,"network":"tcp", icon: https://fastly.jsdelivr.net/gh/clash-verge-rev/clash-verge-rev.github.io@main/docs/assets/icons/flags/tw.svg}
+  - {"name":"🇸🇬 aws-新加坡","type":"trojan","server":"sg.yssqtao.me","port":41427,"udp":true,"password":"bdVxI3BE43","sni":"sg.yssqtao.me","skip-cert-verify":true,"network":"tcp", icon: https://fastly.jsdelivr.net/gh/clash-verge-rev/clash-verge-rev.github.io@main/docs/assets/icons/flags/sg.svg}
+  - {"name":"🇯🇵 az-日本","type":"trojan","server":"az.yssqtao.me","port":51058,"udp":true,"password":"mNzl8ymW56","sni":"az.yssqtao.me","skip-cert-verify":true,"network":"tcp", icon: https://fastly.jsdelivr.net/gh/clash-verge-rev/clash-verge-rev.github.io@main/docs/assets/icons/flags/jp.svg}
+  - {"name":"🇺🇸 do-美国","type":"vmess","server":"do.yssqtao.me","port":21940,"cipher":"auto","uuid":"f9f81974-602d-4d78-8fec-545015a7782b","alterId":0,"tls":false,"skip-cert-verify":true,"network":"tcp", icon: https://fastly.jsdelivr.net/gh/clash-verge-rev/clash-verge-rev.github.io@main/docs/assets/icons/flags/us.svg}
+  - {"name":"🇰🇷 az-韩国","type":"trojan","server":"kr.yssqtao.me","port":22904,"udp":true,"password":"vRNjxFFsIF","sni":"kr.yssqtao.me","skip-cert-verify":true,"network":"tcp", icon: https://fastly.jsdelivr.net/gh/clash-verge-rev/clash-verge-rev.github.io@main/docs/assets/icons/flags/kr.svg}
+proxy-groups:
+  # 分流策略组
+  - {name: Proxy, type: select, proxies: [香港节点, 台湾节点, 狮城节点, 日本节点, 韩国节点, 美国节点], icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Final.png}
+  - {name: CSDN, type: select, proxies: [DIRECT, Proxy], icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Scholar.png}
+  - {name: BiliBili, type: select, proxies: [DIRECT, 香港节点, 台湾节点], icon: https://fastly.jsdelivr.net/gh/Orz-3/mini@master/Color/bilibili.png}
+  - {name: Github, type: select, proxies: [香港节点, 台湾节点, 狮城节点, 日本节点, 韩国节点, 美国节点], icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/GitHub.png}
+  - {name: OpenAI, type: select, proxies: [日本节点, 狮城节点, 韩国节点, 美国节点], icon: https://clash-verge-rev.github.io/assets/icons/chatgpt.svg}
+  - {name: New Bing, type: select, proxies: [DIRECT, 狮城节点, 日本节点, 韩国节点, 美国节点], icon: https://clash-verge-rev.github.io/assets/icons/bing.svg}
+  - {name: Spotify, type: select, proxies: [香港节点, 台湾节点, 狮城节点, 日本节点, 韩国节点, 美国节点], icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Spotify.png}
+  - {name: YouTube, type: select, proxies: [香港节点, 台湾节点, 狮城节点, 日本节点, 韩国节点, 美国节点], icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/YouTube.png}
+  - {name: Google, type: select, proxies: [香港节点, 台湾节点, 狮城节点, 日本节点, 韩国节点, 美国节点], icon: https://clash-verge-rev.github.io/assets/icons/google.svg}
+  - {name: Telegram, type: select, proxies: [香港节点, 台湾节点, 狮城节点, 日本节点, 韩国节点, 美国节点], icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Telegram.png}
+  - {name: TikTok, type: select, proxies: [狮城节点, 日本节点, 韩国节点, 美国节点], icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/TikTok.png}
+  - {name: Microsoft, type: select, proxies: [DIRECT, 香港节点, 台湾节点, 狮城节点, 日本节点, 韩国节点, 美国节点], icon: https://clash-verge-rev.github.io/assets/icons/microsoft.svg}
+  - {name: Apple, type: select, proxies: [DIRECT, 香港节点, 台湾节点, 狮城节点, 日本节点, 韩国节点, 美国节点], icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Apple.png}
+  - {name: Amazon, type: select, proxies: [DIRECT, 香港节点, 台湾节点, 狮城节点, 日本节点, 韩国节点, 美国节点], icon: https://clash-verge-rev.github.io/assets/icons/amazon.svg}
+  - {name: Paypal, type: select, proxies: [DIRECT, 香港节点, 美国节点], icon: https://www.svgrepo.com/show/508716/paypal.svg}
+  - {name: Media, type: select, proxies: [香港节点, 台湾节点, 狮城节点, 日本节点, 韩国节点, 美国节点], icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Emby.png}
+  - {name: Game, type: select, proxies: [DIRECT, 香港节点, 台湾节点, 狮城节点, 日本节点, 韩国节点, 美国节点], icon: https://clash-verge-rev.github.io/assets/icons/steam.svg}
+  - {name: Global, type: select, proxies: [香港节点, 台湾节点, 狮城节点, 日本节点, 韩国节点, 美国节点], icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Global.png}
+  - {name: 国内直连, type: select, proxies: [DIRECT], icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/China.png}
+  - {name: 兜底分流, type: select, proxies: [DIRECT, Proxy], icon: https://clash-verge-rev.github.io/assets/icons/fish.svg}
+  # 国家策略组
+  - {name: 香港节点, type: select, proxies: [🇭🇰 gcp-香港], icon: https://fastly.jsdelivr.net/gh/clash-verge-rev/clash-verge-rev.github.io@main/docs/assets/icons/flags/hk.svg}
+  - {name: 台湾节点, type: select, proxies: [🇹🇼 gcp-台湾], icon: https://fastly.jsdelivr.net/gh/clash-verge-rev/clash-verge-rev.github.io@main/docs/assets/icons/flags/tw.svg}
+  - {name: 狮城节点, type: select, proxies: [🇸🇬 aws-新加坡], icon: https://fastly.jsdelivr.net/gh/clash-verge-rev/clash-verge-rev.github.io@main/docs/assets/icons/flags/sg.svg}
+  - {name: 日本节点, type: select, proxies: [🇯🇵 az-日本], icon: https://fastly.jsdelivr.net/gh/clash-verge-rev/clash-verge-rev.github.io@main/docs/assets/icons/flags/jp.svg}
+  - {name: 韩国节点, type: select, proxies: [🇰🇷 az-韩国], icon: https://fastly.jsdelivr.net/gh/clash-verge-rev/clash-verge-rev.github.io@main/docs/assets/icons/flags/kr.svg}
+  - {name: 美国节点, type: select, proxies: [🇺🇸 do-美国], icon: https://fastly.jsdelivr.net/gh/clash-verge-rev/clash-verge-rev.github.io@main/docs/assets/icons/flags/us.svg}
+  # 机场策略组
+  # 可使用 `include-all-providers: true` 代替 `use: [provider1, provider2]`,意思为引入所有代理集合
+  # 容差大于 50ms 才会切换到延迟低的那个节点
+  - {name: 飞鸟云, type: url-test, tolerance: 50, use: [provider1], icon: https://clash-verge-rev.github.io/assets/icons/twitter.svg}
+  - {name: 顶级, type: url-test, tolerance: 50, use: [provider2], icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Rocket.png}
+# 分流规则订阅
+rule-providers:
+  # 规则修正
+  Direct: {<<: *d, url: https://cdn.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/Direct/Direct.yaml, path: ./ruleset/Direct.yaml}
+  # 下载服务
+  Download: {<<: *c, url: https://cdn.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/Download/Download.yaml, path: ./ruleset/Download.yaml}
+  # 广告拦截
+  #Anti-AD: {<<: *d, url: https://cdn.jsdelivr.net/gh/privacy-protection-tools/anti-AD@master/anti-ad-clash.yaml, path: ./ruleset/anti-ad-clash.yaml}
+  # HTTPDNS拦截
+  HTTPDNS: {<<: *d, url: https://cdn.jsdelivr.net/gh/VirgilClyne/GetSomeFries@main/ruleset/HTTPDNS.Block.yaml, path: ./ruleset/HTTPDNS.Block.yaml}
+  # CSDN
+  CSDN: {<<: *c, url: https://cdn.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/CSDN/CSDN.yaml, path: ./ruleset/CSDN.yaml}
+  # 哔哩哔哩
+  BiliBili: {<<: *c, url: https://cdn.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/BiliBili/BiliBili.yaml, path: ./ruleset/BiliBili.yaml}
+  # AI平台
+  OpenAI: {<<: *c, url: https://cdn.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/OpenAI/OpenAI.yaml, path: ./ruleset/OpenAI.yaml}
+  NewBing: {<<: *c, url: https://cdn.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/Bing/Bing.yaml, path: ./ruleset/Bing.yaml}
+  # Gtihub
+  Github: {<<: *c, url: https://cdn.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/GitHub/GitHub.yaml, path: ./ruleset/Github.yaml}
+  # Spotify
+  Spotify: {<<: *c, url: https://cdn.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/Spotify/Spotify.yaml, path: ./ruleset/Spotify.yaml}
+  # YouTube
+  YouTube: {<<: *c, url: https://cdn.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/YouTube/YouTube.yaml, path: ./ruleset/YouTube.yaml}
+  # 谷歌服务
+  Google: {<<: *c, url: https://cdn.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/Google/Google.yaml, path: ./ruleset/Google.yaml}
+  # 电报消息
+  Telegram: {<<: *c, url: https://cdn.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/Telegram/Telegram.yaml, path: ./ruleset/Telegram.yaml}
+  # TikTok
+  TikTok: {<<: *c, url: https://cdn.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/TikTok/TikTok.yaml, path: ./ruleset/TikTok.yaml} 
+  # 微软服务 
+  Microsoft: {<<: *c, url: https://cdn.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/Microsoft/Microsoft.yaml, path: ./ruleset/Microsoft.yaml}
+  # 苹果服务
+  Apple: {<<: *c, url: https://cdn.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/Apple/Apple_Classical.yaml, path: ./ruleset/Apple.yaml}
+  # 亚马逊
+  Amazon: {<<: *c, url: https://cdn.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/Amazon/Amazon.yaml, path: ./ruleset/Amazon.yaml}
+  # Paypal
+  Paypal: {<<: *c, url: https://cdn.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/PayPal/PayPal.yaml, path: ./ruleset/Paypal.yaml}
+  # 国际媒体
+  GlobalMedia: {<<: *c, url: https://cdn.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/GlobalMedia/GlobalMedia_Classical.yaml, path: ./ruleset/GlobalMedia.yaml}
+  # 游戏平台
+  Game: {<<: *c, url: https://cdn.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/Game/Game.yaml, path: ./ruleset/Game.yaml}
+  # 代理网站
+  ProxyLite: {<<: *c, url: https://cdn.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/ProxyLite/ProxyLite.yaml, path: ./ruleset/ProxyLite.yaml}
+  # 中国大陆IP
+  ChinaIP: {<<: *i, url: https://cdn.jsdelivr.net/gh/soffchen/GeoIP2-CN@release/clash-rule-provider.yml, path: ./ruleset/ChinaIP.yaml}
+
+rules:
+  - RULE-SET,Direct,DIRECT
+  - RULE-SET,Download,DIRECT
+  - RULE-SET,HTTPDNS,DIRECT
+  - RULE-SET,CSDN,CSDN
+  - RULE-SET,BiliBili,BiliBili
+  - RULE-SET,Github,Github
+  - RULE-SET,OpenAI,OpenAI
+  - RULE-SET,NewBing,New Bing
+  - RULE-SET,Spotify,Spotify
+  - RULE-SET,YouTube,YouTube
+  - RULE-SET,Google,Google
+  - RULE-SET,Telegram,Telegram 
+  - RULE-SET,TikTok,TikTok
+  - RULE-SET,Microsoft,Microsoft
+  - RULE-SET,Apple,Apple
+  - RULE-SET,Amazon,Amazon
+  - RULE-SET,Paypal,Paypal
+  - RULE-SET,GlobalMedia,Media
+  - RULE-SET,Game,Game
+  - RULE-SET,ProxyLite,Global
+  - RULE-SET,ChinaIP,国内直连
+  - GEOIP,CN,国内直连
+  - MATCH,兜底分流
