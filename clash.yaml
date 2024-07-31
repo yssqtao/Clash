@@ -28,9 +28,7 @@ dns: # DNS
     - https://1.1.1.1/dns-query
     - https://8.8.8.8/dns-query
   nameserver-policy:
-    "*.swust.edu.cn": # 西科大DNS解析
-      - 202.115.160.33
-      - 202.115.160.36
+    # 添加指定域名解析策略
     "geosite:cn,private":
       - https://doh.pub/dns-query
       - https://dns.alidns.com/dns-query
@@ -44,34 +42,30 @@ i: &i {type: http, behavior: ipcidr, interval: 86400}
 
 proxy-providers:
   provider1:
-    url: "https://feiniaoyun14.life/api/v1/client/subscribe?token=0fa9897e069bc1beaec2c43a2b318bf7"
+    url: "机场订阅链接"
     type: http
     interval: 86400 # 更新时间为一天
     # 每10分钟健康检查节点信息,测试访问谷歌服务器的延迟,正常返回HTTP 204,超时时间3000毫秒
-    health-check: {enable: true,url: "https://www.gstatic.com/generate_204",interval: 600, timeout: 3000} 
-    filter: "日本|美国|英国"
-    exclude-filter: "推荐"
+    health-check: {enable: true,url: "https://www.gstatic.com/generate_204",interval: 600, timeout: 3000}
+    # 使用filter初步筛选
+    # filter: "日本|美国|英国"
+    # exclude-filter: "香港|台湾|新加坡"
     # override:
-      # additional-prefix: "[飞鸟云]" # 为节点名称添加固定前缀
-      # additional-suffix: "[飞鸟云]" # 为节点名称添加固定后缀
+      # additional-prefix: "[]" # 为节点名称添加固定前缀
+      # additional-suffix: "[]" # 为节点名称添加固定后缀
   provider2:
-    url: "https://dash.djjc.cfd/api/v1/client/subscribe?token=120de374cebb69f74e2e441b6b1ea604"
+    url: "机场订阅链接"
     type: http
     interval: 86400
     health-check: {enable: true,url: "https://www.gstatic.com/generate_204",interval: 600, timeout: 3000}
-    filter: "日本|美国|英国"
-    #exclude-filter: "推荐"
-    # override:
-      # additional-prefix: "[顶级机场]" # 为节点名称添加固定前缀
-      # additional-suffix: "[顶级机场]" # 为节点名称添加固定后缀
 proxies:
-  # 自建节点
-  - {"name":"🇭🇰 gcp-香港","type":"trojan","server":"hk.yssqtao.me","port":34666,"udp":true,"password":"D0bzl24zup","sni":"hk.yssqtao.me","skip-cert-verify":true,"network":"tcp", icon: https://fastly.jsdelivr.net/gh/clash-verge-rev/clash-verge-rev.github.io@main/docs/assets/icons/flags/hk.svg}
-  - {"name":"🇹🇼 gcp-台湾","type":"trojan","server":"tw.yssqtao.me","port":31725,"udp":true,"password":"ZkmLjq29SA","sni":"tw.yssqtao.me","skip-cert-verify":true,"network":"tcp", icon: https://fastly.jsdelivr.net/gh/clash-verge-rev/clash-verge-rev.github.io@main/docs/assets/icons/flags/tw.svg}
-  - {"name":"🇸🇬 aws-新加坡","type":"trojan","server":"sg.yssqtao.me","port":41427,"udp":true,"password":"bdVxI3BE43","sni":"sg.yssqtao.me","skip-cert-verify":true,"network":"tcp", icon: https://fastly.jsdelivr.net/gh/clash-verge-rev/clash-verge-rev.github.io@main/docs/assets/icons/flags/sg.svg}
-  - {"name":"🇯🇵 az-日本","type":"trojan","server":"az.yssqtao.me","port":51058,"udp":true,"password":"mNzl8ymW56","sni":"az.yssqtao.me","skip-cert-verify":true,"network":"tcp", icon: https://fastly.jsdelivr.net/gh/clash-verge-rev/clash-verge-rev.github.io@main/docs/assets/icons/flags/jp.svg}
-  - {"name":"🇺🇸 do-美国","type":"vmess","server":"do.yssqtao.me","port":21940,"cipher":"auto","uuid":"f9f81974-602d-4d78-8fec-545015a7782b","alterId":0,"tls":false,"skip-cert-verify":true,"network":"tcp", icon: https://fastly.jsdelivr.net/gh/clash-verge-rev/clash-verge-rev.github.io@main/docs/assets/icons/flags/us.svg}
-  - {"name":"🇰🇷 az-韩国","type":"trojan","server":"kr.yssqtao.me","port":22904,"udp":true,"password":"vRNjxFFsIF","sni":"kr.yssqtao.me","skip-cert-verify":true,"network":"tcp", icon: https://fastly.jsdelivr.net/gh/clash-verge-rev/clash-verge-rev.github.io@main/docs/assets/icons/flags/kr.svg}
+  # 自建节点,从x-ui面板复制节点信息，使用节点转换工具转换为Clash支持的格式
+  - {"name":"🇭🇰 gcp-香港","type":"trojan","server":"aaaaaaaaa","port":12345,"udp":true,"password":"123456789","sni":"aaaaaaaaa","skip-cert-verify":true,"network":"tcp"}
+  - {"name":"🇹🇼 gcp-台湾","type":"trojan","server":"aaaaaaaaa","port":12345,"udp":true,"password":"123456789","sni":"aaaaaaaaa","skip-cert-verify":true,"network":"tcp"}
+  - {"name":"🇸🇬 aws-新加坡","type":"trojan","server":"aaaaaaaaa","port":12345,"udp":true,"password":"123456789","sni":"aaaaaaaaa","skip-cert-verify":true,"network":"tcp"}
+  - {"name":"🇯🇵 az-日本","type":"trojan","server":"aaaaaaaaa","port":12345,"udp":true,"password":"123456789","sni":"aaaaaaaaa","skip-cert-verify":true,"network":"tcp"}
+  - {"name":"🇺🇸 do-美国","type":"vmess","server":"aaaaaaaaa","port":12345,"cipher":"auto","uuid":"aaaaaaaaa","alterId":0,"tls":false,"skip-cert-verify":true,"network":"tcp"}
+  - {"name":"🇰🇷 az-韩国","type":"trojan","server":"aaaaaaaaa","port":12345,"udp":true,"password":"123456789","sni":"aaaaaaaaa","skip-cert-verify":true,"network":"tcp"}
 proxy-groups:
   # 分流策略组
   - {name: Proxy, type: select, proxies: [香港节点, 台湾节点, 狮城节点, 日本节点, 韩国节点, 美国节点], icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Final.png}
@@ -104,8 +98,8 @@ proxy-groups:
   # 机场策略组
   # 可使用 `include-all-providers: true` 代替 `use: [provider1, provider2]`,意思为引入所有代理集合
   # 容差大于 50ms 才会切换到延迟低的那个节点
-  - {name: 飞鸟云, type: url-test, tolerance: 50, use: [provider1], icon: https://clash-verge-rev.github.io/assets/icons/twitter.svg}
-  - {name: 顶级, type: url-test, tolerance: 50, use: [provider2], icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Rocket.png}
+  - {name: 机场名称1, type: url-test, tolerance: 50, use: [provider1], icon: https://clash-verge-rev.github.io/assets/icons/twitter.svg}
+  - {name: 机场名称2, type: url-test, tolerance: 50, use: [provider2], icon: https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Rocket.png}
 # 分流规则订阅
 rule-providers:
   # 规则修正
@@ -113,7 +107,7 @@ rule-providers:
   # 下载服务
   Download: {<<: *c, url: https://cdn.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/Download/Download.yaml, path: ./ruleset/Download.yaml}
   # 广告拦截
-  #Anti-AD: {<<: *d, url: https://cdn.jsdelivr.net/gh/privacy-protection-tools/anti-AD@master/anti-ad-clash.yaml, path: ./ruleset/anti-ad-clash.yaml}
+  # Anti-AD: {<<: *d, url: https://cdn.jsdelivr.net/gh/privacy-protection-tools/anti-AD@master/anti-ad-clash.yaml, path: ./ruleset/anti-ad-clash.yaml}
   # HTTPDNS拦截
   HTTPDNS: {<<: *d, url: https://cdn.jsdelivr.net/gh/VirgilClyne/GetSomeFries@main/ruleset/HTTPDNS.Block.yaml, path: ./ruleset/HTTPDNS.Block.yaml}
   # CSDN
